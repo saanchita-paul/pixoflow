@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessOrderZipJob;
 use App\Models\File;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -32,61 +33,25 @@ class OrderController extends Controller
         $order = Order::create([
             'title' => $request->title,
             'description' => $request->description,
-            'status' => 'pending',
+            'status' => Order::STATUS_PROCESSING,
             'created_by' => auth()->id(),
         ]);
 
         $zipFile = $request->file('zip_file');
-        $zipFileName = $zipFile->getClientOriginalName();
-
+        $zipFileName = Str::random(10) . '_' . $zipFile->getClientOriginalName();
         $tempPath = storage_path("app/temp");
+
+        if (!file_exists($tempPath)) {
+            mkdir($tempPath, 0755, true);
+        }
+
         $zipFilePath = $tempPath . '/' . $zipFileName;
         $zipFile->move($tempPath, $zipFileName);
 
-        $zip = new ZipArchive;
-        if ($zip->open($zipFilePath) === TRUE) {
-            // Slugify folder name and add order ID to avoid collision
-            $folderName = Str::slug($request->title) . '-' . $order->id;
-            $extractPath = storage_path("app/public/orders/$folderName");
+        ProcessOrderZipJob::dispatch($order, $zipFilePath);
 
-            if (!file_exists($extractPath)) {
-                mkdir($extractPath, 0755, true);
-            }
-
-            $zip->extractTo($extractPath);
-            $zip->close();
-
-            // Save extracted files recursively
-            $this->storeFiles($extractPath, $order->id, '');
-
-            // Remove temp ZIP file
-            unlink($zipFilePath);
-
-            return redirect()->route('orders.index')
-                ->with('success', 'Order created and ZIP extracted successfully!');
-        } else {
-            return back()->withErrors(['zip_file' => 'Failed to open the ZIP file.']);
-        }
-    }
-
-    private function storeFiles($directory, $orderId, $relativePath = '')
-    {
-        foreach (scandir($directory) as $item) {
-            if ($item === '.' || $item === '..') continue;
-
-            $fullPath = $directory . DIRECTORY_SEPARATOR . $item;
-            $newRelativePath = $relativePath ? "$relativePath/$item" : $item;
-
-            if (is_dir($fullPath)) {
-                $this->storeFiles($fullPath, $orderId, $newRelativePath);
-            } elseif (is_file($fullPath)) {
-                File::create([
-                    'order_id' => $orderId,
-                    'name' => $item,
-                    'path' => $relativePath,
-                ]);
-            }
-        }
+        return redirect()->route('orders.index')
+            ->with('success', 'Order created! Files are being processed. This may take a little time.');
     }
 
     public function show(Order $order, Request $request)
