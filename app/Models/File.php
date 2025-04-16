@@ -17,4 +17,10 @@ class File extends Model
         return $this->belongsTo(Order::class);
     }
 
+    public function userClaims()
+    {
+        return $this->hasMany(UserClaim::class);
+    }
+
+
 }

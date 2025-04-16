@@ -46,4 +46,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function claimedFiles()
+    {
+        return $this->hasMany(\App\Models\UserClaim::class);
+    }
+
 }

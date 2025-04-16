@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\OrderBrowserController;
 use App\Http\Controllers\OrderController;
@@ -28,9 +29,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/create-user', [RegisteredUserController::class, 'store'])->name('admin.store-user');
     Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/admin/order-progress/{order}', [AdminController::class, 'orderProgress'])->name('admin.order-progress');
+
 });
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+Route::post('/orders/{order}/claim-files', [OrderController::class, 'claimFiles'])->name('orders.claim-files');
+Route::post('/claims/{claim}/status', [OrderController::class, 'updateStatus'])->name('claims.update-status');
 
 
 

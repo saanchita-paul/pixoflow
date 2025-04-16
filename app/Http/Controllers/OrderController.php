@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessOrderZipJob;
 use App\Models\File;
 use App\Models\Order;
+use App\Models\UserClaim;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use ZipArchive;
 
@@ -60,6 +62,7 @@ class OrderController extends Controller
 
         $files = $order->files()
             ->where('path', $currentFolder)
+            ->with('userClaims')
             ->get();
 
         $subFolders = $order->files()
@@ -73,8 +76,98 @@ class OrderController extends Controller
             ->unique()
             ->filter()
             ->values();
+        $claim = UserClaim::where('order_id', $order->id)->first();
 
-        return view('orders.show', compact('order', 'files', 'subFolders', 'currentFolder'));
+        return view('orders.show', compact('order', 'files', 'subFolders', 'currentFolder','claim'));
     }
+
+    public function claimFiles(Request $request, Order $order)
+    {
+        Log::info('Claim Files Request', [
+            'user' => auth()->id(),
+            'order_id' => $order->id,
+            'file_ids' => $request->file_ids,
+            'folder_paths' => $request->folder_paths,
+        ]);
+
+        $validated = $request->validate([
+            'file_ids' => 'array',
+            'file_ids.*' => 'exists:files,id',
+            'folder_paths' => 'array',
+            'folder_paths.*' => 'string',
+        ]);
+
+        $userId = auth()->id();
+
+
+        if (!empty($validated['file_ids'])) {
+            $claimedByOthers = UserClaim::whereIn('file_id', $validated['file_ids'])
+                ->where('order_id', $order->id)
+                ->where('user_id', '!=', $userId)
+                ->pluck('file_id')
+                ->toArray();
+
+            foreach ($validated['file_ids'] as $fileId) {
+                if (!in_array($fileId, $claimedByOthers)) {
+                    UserClaim::firstOrCreate([
+                        'user_id' => $userId,
+                        'order_id' => $order->id,
+                        'file_id' => $fileId,
+                    ]);
+                }
+            }
+        }
+
+        if (!empty($validated['folder_paths'])) {
+            foreach ($validated['folder_paths'] as $folderPath) {
+                $files = $order->files()
+                    ->where('path', $folderPath)
+                    ->get();
+
+                if ($files->isEmpty()) {
+                    continue;
+                }
+
+                $fileIds = $files->pluck('id')->toArray();
+                $claimedByOthers = UserClaim::whereIn('file_id', $fileIds)
+                    ->where('order_id', $order->id)
+                    ->where('user_id', '!=', $userId)
+                    ->pluck('file_id')
+                    ->toArray();
+
+                foreach ($files as $file) {
+                    if (!in_array($file->id, $claimedByOthers)) {
+                        UserClaim::firstOrCreate([
+                            'user_id' => $userId,
+                            'order_id' => $order->id,
+                            'file_id' => $file->id,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return back()->with('success', 'Files and folders successfully claimed.');
+    }
+
+
+    public function updateStatus(Request $request, UserClaim $claim)
+    {
+        $request->validate([
+            'file_id' => 'required|exists:files,id',
+            'status' => 'required|in:in_progress,completed',
+        ]);
+
+        if ($claim->file_id != $request->file_id || $claim->user_id != auth()->id()) {
+            return response()->json(['message' => 'You haven’t claimed this file'], 403);
+        }
+
+        $claim->update(['status' => $request->status]);
+
+        return back()->with('success', 'Status updated!');
+    }
+
+
+
 }
 
