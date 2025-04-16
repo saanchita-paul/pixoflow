@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\OrderBrowserController;
@@ -31,7 +32,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/admin/order-progress/{order}', [AdminController::class, 'orderProgress'])->name('admin.order-progress');
     Route::get('/admin/logs', [AdminController::class, 'logs'])->name('admin.logs');
-
+    Route::get('/progress-dashboard', [DashboardController::class, 'index'])->name('progress.dashboard');
 });
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');

@@ -45,6 +45,9 @@
                                 <x-dropdown-link :href="route('admin.logs')" :active="request()->routeIs('admin.logs')">
                                     {{ __('View Logs') }}
                                 </x-dropdown-link>
+                                <x-dropdown-link :href="route('progress.dashboard')" :active="request()->routeIs('progress.dashboard')">
+                                    {{ __('Order Progress') }}
+                                </x-dropdown-link>
                             @endif
                         @endauth
 

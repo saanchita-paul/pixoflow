@@ -47,7 +47,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function claimedFiles()
+    public function claims()
     {
         return $this->hasMany(\App\Models\UserClaim::class);
     }
