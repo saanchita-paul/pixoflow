@@ -30,6 +30,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/admin/order-progress/{order}', [AdminController::class, 'orderProgress'])->name('admin.order-progress');
+    Route::get('/admin/logs', [AdminController::class, 'logs'])->name('admin.logs');
 
 });
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');

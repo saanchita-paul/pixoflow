@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('file_id');
-            $table->enum('status', ['in_progress', 'completed'])->default('in_progress');
+            $table->enum('status', ['claimed','in_progress', 'completed'])->default('in_progress');
             $table->timestamps();
         });
     }

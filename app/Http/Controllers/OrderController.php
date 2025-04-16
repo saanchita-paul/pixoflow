@@ -155,7 +155,7 @@ class OrderController extends Controller
     {
         $request->validate([
             'file_id' => 'required|exists:files,id',
-            'status' => 'required|in:in_progress,completed',
+            'status' => 'required|in:claimed,in_progress,completed',
         ]);
 
         if ($claim->file_id != $request->file_id || $claim->user_id != auth()->id()) {

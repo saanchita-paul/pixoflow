@@ -18,4 +18,13 @@ class AdminController extends Controller
         return view('admin.order-progress', compact('order', 'claims'));
     }
 
+    public function logs()
+    {
+        $logs = UserClaim::with(['user', 'file', 'order'])
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.logs', compact('logs'));
+    }
+
 }

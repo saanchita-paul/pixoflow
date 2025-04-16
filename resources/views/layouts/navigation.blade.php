@@ -42,8 +42,12 @@
                                 <x-dropdown-link :href="route('admin.create-user')" :active="request()->routeIs('admin.create-user')">
                                     {{ __('Create User') }}
                                 </x-dropdown-link>
+                                <x-dropdown-link :href="route('admin.logs')" :active="request()->routeIs('admin.logs')">
+                                    {{ __('View Logs') }}
+                                </x-dropdown-link>
                             @endif
                         @endauth
+
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
