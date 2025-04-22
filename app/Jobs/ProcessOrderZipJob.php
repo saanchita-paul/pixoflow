@@ -65,6 +65,7 @@ class ProcessOrderZipJob implements ShouldQueue
                     'name' => $item,
                     'path' => $relativePath,
                 ]);
+
             }
         }
     }
