@@ -67,29 +67,29 @@ composer install
 npm install && npm run dev
 
 ```
-# Copy environment file & set credentials
+### Copy environment file & set credentials
 ```
 cp .env.example .env
 php artisan key:generate
 ```
-# Set DB credentials in `.env` then run:
+### Set DB credentials in `.env` then run:
 ```
 php artisan migrate
 ```
-# Set storage link for public access to uploaded files
+### Set storage link for public access to uploaded files
 ```
 php artisan storage:link
 ```
-# Start the server
+### Start the server
 ```
 php artisan serve
 ```
-#Start the queue worker:
+### Start the queue worker:
 ```
 php artisan queue:work
 
 ```
-#Start the Reverb WebSocket server:
+### Start the Reverb WebSocket server:
 ```
 php artisan reverb:start
 ```
