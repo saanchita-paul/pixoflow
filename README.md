@@ -1,4 +1,4 @@
-# 📸 Pixofix Production Order Management System
+# 📸 Pixofix File Management System
 
 A web-based Laravel application designed to streamline the management of production orders consisting of multiple image files. Built with real-time collaboration and task tracking in mind, this system allows employees to claim image batches, work on them, and update statuses—all while giving the admin full visibility of progress.
 
@@ -30,6 +30,10 @@ A web-based Laravel application designed to streamline the management of product
 - Track who is working on what, total completed, and remaining files
 - View logs and performance per employee
 
+### 🔍 Debugging & Insights
+Integrated Laravel Telescope for request tracking, events, queues, and more
+
+Access at: http://127.0.0.1:8000/telescope/
 ---
 
 ## 🧰 Tech Stack

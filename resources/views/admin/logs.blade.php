@@ -20,9 +20,9 @@
                     <td class="p-2">{{ $log->order->title ?? 'N/A' }}</td>
                     <td class="p-2">
                             <span class="px-2 py-1 rounded text-white
-                                {{ $log->status === 'Completed' ? 'bg-green-600' :
-                                   ($log->status === 'In Progress' ? 'bg-yellow-500' : 'bg-gray-400') }}">
-                                {{ $log->status }}
+                                {{ $log->action === 'Completed' ? 'bg-green-600' :
+                                   ($log->action === 'In Progress' ? 'bg-yellow-500' : 'bg-gray-400') }}">
+                                {{ $log->action }}
                             </span>
                     </td>
                     <td class="p-2 text-gray-500">{{ $log->updated_at->format('M d, Y H:i') }}</td>

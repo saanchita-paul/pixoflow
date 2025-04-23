@@ -2,10 +2,13 @@
 
 namespace App\Services\Order;
 
-use App\Events\FileClaimed;
+
+use App\Models\File;
 use App\Models\Order;
+use App\Models\User;
 use App\Models\UserClaim;
 use App\Models\UserClaimLog;
+use App\Notifications\FileClaimedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -50,10 +53,16 @@ class ClaimFilesService
                     'file_id' => $fileId,
                     'action' => UserClaimLog::ACTION_CLAIMED,
                 ]);
+                $admins = User::where('role', 'admin')->get();
+                $file = File::find($fileId);
+                Log::info('notifytoadmin1',[json_encode($admins), count($admins)] );
+                foreach ($admins as $admin) {
+                    $admin->notify(new FileClaimedNotification($file, auth()->user()));
+                }
             }
         }
 
-        if (!empty($validated['folder_paths'])) {
+        if (!empty($validated['folder_paths'] ?? [])) {
             foreach ($validated['folder_paths'] as $folderPath) {
                 $files = $order->files()
                     ->where('path', $folderPath)
@@ -71,6 +80,8 @@ class ClaimFilesService
                     ->toArray();
 
                 foreach ($files as $file) {
+
+
                     if (!in_array($file->id, $claimedByOthers)) {
                         UserClaim::firstOrCreate([
                             'user_id' => $userId,
@@ -91,7 +102,11 @@ class ClaimFilesService
                             'action' => UserClaimLog::ACTION_CLAIMED,
                         ]);
 
-                        event(new FileClaimed($file, auth()->user()));
+                        $admins = User::where('role', 'admin')->get();
+                        Log::info('notifytoadmin2',[json_encode($admins), count($admins)] );
+                        foreach ($admins as $admin) {
+                            $admin->notify(new FileClaimedNotification($file, auth()->user()));
+                        }
                     }
                 }
             }

@@ -1,10 +1,15 @@
 <?php
 namespace App\Services\Order;
 
-use App\Events\FileClaimed;
+
+use App\Models\File;
+use App\Models\User;
 use App\Models\UserClaim;
 use App\Models\UserClaimLog;
+use App\Notifications\FileClaimedNotification;
+use App\Notifications\FileStatusUpdatedNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class UpdateStatusService
 {
@@ -28,6 +33,12 @@ class UpdateStatusService
             'action' => $request->status,
         ]);
 
-        event(new FileClaimed($claim->file, auth()->user()));
+//
+        $admins = User::where('role', 'admin')->get();
+        $file = File::find($claim->file_id);
+
+        foreach ($admins as $admin) {
+            $admin->notify(new FileStatusUpdatedNotification($file, auth()->user(), $request->status));
+        }
     }
 }

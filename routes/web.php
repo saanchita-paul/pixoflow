@@ -7,6 +7,7 @@ use App\Http\Controllers\OrderBrowserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Order;
+use App\Notifications\TestNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -39,7 +40,10 @@ Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 Route::post('/orders/{order}/claim-files', [OrderController::class, 'claimFiles'])->name('orders.claim-files');
 Route::post('/claims/{claim}/status', [OrderController::class, 'updateStatus'])->name('claims.update-status');
 
-
+Route::get('testdd', function (){
+    $user = \App\Models\User::find(1);
+    $user->notify(new TestNotification(1));
+});
 
 
 require __DIR__.'/auth.php';

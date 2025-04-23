@@ -1,5 +1,16 @@
 <x-app-layout>
     <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        @if (session('success'))
+            <div class="mb-4 px-4 py-3 bg-green-100 text-green-800 border border-green-200 rounded">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="mb-4 px-4 py-3 bg-red-100 text-red-800 border border-red-200 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
         <div class="mb-6">
             <h2 class="text-xl font-bold text-gray-800">
                 📁 {{ $order->title }}
@@ -173,5 +184,12 @@
             }
             checkboxes.forEach(cb => cb.addEventListener('change', toggleButton));
         });
+
+        {{--window.Echo.private(`order.{{ $order->id }}`)--}}
+        {{--    .listen('FileClaimed', (e) => {--}}
+        {{--        console.log('File claimed:', e);--}}
+        {{--        alert(`File ${e.file_id} claimed by ${e.user_name}`);--}}
+        {{--    });--}}
     </script>
 </x-app-layout>
+
