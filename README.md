@@ -54,10 +54,12 @@ A web-based Laravel application designed to streamline the management of product
 > - Node.js and npm
 > - MySQL
 
-```bash
 # Clone the repo
+
+```
 git clone https://github.com/saanchita-paul/pixoflow.git
 cd pixofix-order-management
+````
 
 # Install dependencies
 ```
@@ -90,5 +92,4 @@ php artisan queue:work
 #Start the Reverb WebSocket server:
 ```
 php artisan reverb:start
-
 ```
