@@ -9,6 +9,7 @@ A web-based Laravel application designed to streamline the management of product
 ### ✅ User Authentication & Role Management
 - User login/registration using **Laravel Breeze**
 - Roles: `Admin`, `Employee`
+- Note: Roles are implemented using ENUM in the database. While this simplifies use for a limited, predefined set of roles, it is not considered best practice in scalable applications. A separate roles table with relationships is generally recommended for flexibility. This approach was chosen here for convenience, as per the project scope and absence of detailed requirements.
 
 ### 📁 Order & File Management
 - Admin can create new **Orders** by uploading a ZIP file containing folders & image files
