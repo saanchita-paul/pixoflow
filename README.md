@@ -97,7 +97,6 @@ php artisan reverb:install
 ```
 This command will automatically generate and add the REVERB_APP_ID, REVERB_APP_KEY, and REVERB_APP_SECRET to your .env file.
 
-```
 ### Start the queue worker:
 ```
 php artisan queue:work
