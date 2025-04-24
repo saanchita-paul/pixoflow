@@ -4,14 +4,11 @@ namespace App\Services\Order;
 
 use App\Models\Order;
 use App\Models\UserClaim;
-use Illuminate\Http\Request;
 
 class ShowOrderService
 {
-    public function handle(Order $order, Request $request)
+    public function handle(Order $order, string $currentFolder = ''): array
     {
-        $currentFolder = $request->get('folder', '');
-
         $files = $order->files()
             ->where('path', $currentFolder)
             ->with('userClaims')
@@ -34,3 +31,4 @@ class ShowOrderService
         return compact('files', 'subFolders', 'currentFolder', 'claim');
     }
 }
+

@@ -88,6 +88,15 @@ php artisan storage:link
 ```
 php artisan serve
 ```
+
+### Reverb API Credentials Installation
+To set up Reverb broadcasting credentials, run the following Artisan command:
+```
+php artisan reverb:install
+```
+This command will automatically generate and add the REVERB_APP_ID, REVERB_APP_KEY, and REVERB_APP_SECRET to your .env file.
+
+```
 ### Start the queue worker:
 ```
 php artisan queue:work

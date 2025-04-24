@@ -5,36 +5,29 @@ namespace App\Services\Order;
 use App\Jobs\ProcessOrderZipJob;
 use App\Models\Order;
 use App\Models\UserClaimLog;
-use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
 class CreateOrderService
 {
-    public function handle(Request $request)
+    public function handle(string $title, ?string $description, UploadedFile $zipFile, int $userId): Order
     {
-        $request->validate([
-            'title' => 'required|string',
-            'description' => 'nullable|string',
-            'zip_file' => 'required|file|mimes:zip',
-        ]);
-
         $order = Order::create([
-            'title' => $request->title,
-            'description' => $request->description,
+            'title' => $title,
+            'description' => $description,
             'status' => Order::STATUS_PROCESSING,
-            'created_by' => auth()->id(),
+            'created_by' => $userId,
         ]);
 
         UserClaimLog::create([
-            'user_id' => auth()->id(),
+            'user_id' => $userId,
             'order_id' => $order->id,
             'file_id' => null,
             'action' => UserClaimLog::ACTION_ORDER_CREATED,
         ]);
 
-        $zipFile = $request->file('zip_file');
         $zipFileName = Str::random(10) . '_' . $zipFile->getClientOriginalName();
-        $tempPath = storage_path("app/temp");
+        $tempPath = storage_path('app/temp');
 
         if (!file_exists($tempPath)) {
             mkdir($tempPath, 0755, true);
@@ -48,3 +41,4 @@ class CreateOrderService
         return $order;
     }
 }
+

@@ -98,7 +98,19 @@
                             </span>
                         </div>
                         @if($isClaimed)
-                            <span class="ml-4 text-xs text-red-600">🔒 Claimed</span>
+                                @php
+                                    $claim = $file->userClaims->first();
+                                    $statusLabel = [
+                                        'in_progress' => '🛠 In Progress',
+                                        'completed' => '✅ Completed',
+                                    ][$claim->status ?? ''] ?? '';
+                                @endphp
+                                <div class="ml-4 text-xs text-red-600 flex flex-col items-start">
+                                    <span>🔒 Claimed</span>
+                                    @if($statusLabel)
+                                        <span class="text-gray-600">{{ $statusLabel }}</span>
+                                    @endif
+                                </div>
                         @else
                             <input type="checkbox" name="file_ids[]" value="{{ $file->id }}" class="ml-4 file-checkbox">
                         @endif
@@ -113,7 +125,12 @@
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">See Progress</a>
                                 <button type="button"
                                         class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        onclick="openStatusModal('{{ $order->id }}', '{{ $file->id }}', '{{ optional($file->userClaims->first())->id }}')">
+                                        onclick="openStatusModal(
+                                        '{{ $order->id }}',
+                                        '{{ $file->id }}',
+                                        '{{ optional($file->userClaims->first())->id }}',
+                                        '{{ optional($file->userClaims->first())->status }}'
+                                    )">
                                     Change Status
                                 </button>
                             </div>
@@ -185,11 +202,21 @@
             checkboxes.forEach(cb => cb.addEventListener('change', toggleButton));
         });
 
-        {{--window.Echo.private(`order.{{ $order->id }}`)--}}
-        {{--    .listen('FileClaimed', (e) => {--}}
-        {{--        console.log('File claimed:', e);--}}
-        {{--        alert(`File ${e.file_id} claimed by ${e.user_name}`);--}}
-        {{--    });--}}
+        function openStatusModal(orderId, fileId, claimId, currentStatus = '') {
+            document.getElementById('modalOrderId').value = orderId;
+            document.getElementById('modalFileId').value = fileId;
+            document.getElementById('statusForm').action = `/claims/${claimId}/status`;
+
+            const statusSelect = document.getElementById('status');
+            if (statusSelect && ['in_progress', 'completed'].includes(currentStatus)) {
+                statusSelect.value = currentStatus;
+            } else {
+                statusSelect.value = '';
+            }
+
+            document.getElementById('statusModal').classList.remove('hidden');
+        }
+
     </script>
 </x-app-layout>
 
